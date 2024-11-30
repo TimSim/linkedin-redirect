@@ -5,16 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // Extract the authorization code from the URL and redirect to your app
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        const state = params.get('state'); // Optionally verify the state parameter
-        if (code) {
-            // Redirect to your app using a custom scheme
-            window.location.href = `myapp://auth/linkedin/callback?code=${code}`;
-        } else {
-            document.body.innerHTML = "Error: Missing authorization code.";
-        }
+        (function() {
+            // Extract query parameters from the URL
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            const state = params.get('state');
+            const error = params.get('error');
+            const errorDescription = params.get('error_description');
+
+            // Retrieve the original state from secure storage
+            const storedState = localStorage.getItem('oauth_state'); // Replace with a more secure storage mechanism as appropriate
+
+            // Function to display messages to the user
+            function displayMessage(message) {
+                document.body.textContent = message;
+            }
+
+            // Handle error scenarios
+            if (error) {
+                displayMessage(`Error: ${error}. ${decodeURIComponent(errorDescription)}`);
+                return;
+            }
+
+            // Verify the state parameter to prevent CSRF attacks
+            if (state !== storedState) {
+                displayMessage("Error: Invalid state parameter.");
+                return;
+            }
+
+            // Ensure the authorization code is present
+            if (!code) {
+                displayMessage("Error: Missing authorization code.");
+                return;
+            }
+
+            // Redirect to the app with the authorization code and state
+            window.location.href = `myapp://auth/linkedin/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+        })();
     </script>
 </head>
 <body>
