@@ -13,6 +13,8 @@
             const error = params.get('error');
             const errorDescription = params.get('error_description');
 
+            displayMessage("Debug: params= ${params}");
+
             // Retrieve the original state from secure storage
             const storedState = localStorage.getItem('oauth_state'); // Replace with a more secure storage mechanism as appropriate
 
