@@ -4,49 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
+
     <script>
-        (function() {
-            // Extract query parameters from the URL
-            const params = new URLSearchParams(window.location.search);
-            const code = params.get('code');
-            const state = params.get('state');
-            const error = params.get('error');
-            const errorDescription = params.get('error_description');
+      function displayMessage(message) {
+        document.body.textContent = message;
+      }
 
-            displayMessage("Debug: params= ${params}");
+      (function() {
+        // Extract query parameters from the URL
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const state = params.get('state');
+        const error = params.get('error');
+        const errorDescription = params.get('error_description');
 
-            // Retrieve the original state from secure storage
-            const storedState = localStorage.getItem('oauth_state'); // Replace with a more secure storage mechanism as appropriate
-
-            // Function to display messages to the user
-            function displayMessage(message) {
-                document.body.textContent = message;
-            }
-
-            // Handle error scenarios
-            if (error) {
-                displayMessage(`Error: ${error}. ${decodeURIComponent(errorDescription)}`);
-                return;
-            }
-
+        // Retrieve the original state from secure storage  
+        const storedState = localStorage.getItem('oauth_state');
+        if (storedState) {
             // Verify the state parameter to prevent CSRF attacks
             if (state !== storedState) {
                 displayMessage("Error: Invalid state parameter.");
                 return;
             }
-
             // Ensure the authorization code is present
             if (!code) {
                 displayMessage("Error: Missing authorization code.");
                 return;
             }
-
             // Redirect to the app with the authorization code and state
             window.location.href = `myapp://auth/linkedin/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
         })();
+        } else {
+          displayMessage("Data unavailable yet.");
+        }
+        // Handle error scenarios
+        if (error) {
+            displayMessage(`Error: ${error}. ${decodeURIComponent(errorDescription)}`);
+            return;
+        }
+      })();
     </script>
 </head>
 <body>
-    Redirecting...
+    Redirecting to app...
 </body>
 </html>
