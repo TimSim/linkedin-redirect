@@ -38,16 +38,16 @@
                 // Redirect to the app with the authorization code and state
                 window.location.href = `myapp://auth/linkedin/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
             }
-            innerFunction();
-        })();
-        } else {
-          displayMessage("Data unavailable yet.");
-        }
-        // Handle error scenarios
-        if (error) {
-            displayMessage(`Error: ${error}. ${decodeURIComponent(errorDescription)}`);
-            return;
-        }
+            else {
+              displayMessage("Data unavailable yet.");
+            }
+            // Handle error scenarios
+            if (error) {
+                displayMessage(`Error: ${error}. ${decodeURIComponent(errorDescription)}`);
+                return;
+            }
+          }
+        innerFunction();
       })();
     </script>
 </head>
