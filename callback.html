@@ -3,55 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-
+    <title>LinkedIn Authorization Redirect</title>
     <script>
-      function displayMessage(message) {
-        document.body.textContent = message;
-      }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Debug logging
+        console.log('Redirect page loaded');
+        console.log('Full URL:', window.location.href);
 
-      (function() {
-          function innerFunction() {
-            // Call the function to confirm execution
-            displayMessage("Script executed successfully.");
-          
-            // Extract query parameters from the URL
-            const params = new URLSearchParams(window.location.search);
-            const code = params.get('code');
-            const state = params.get('state');
-            const error = params.get('error');
-            const errorDescription = params.get('error_description');
+        // Retrieve query parameters
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const state = params.get('state');
+        const error = params.get('error');
 
-            // Retrieve the original state from secure storage  
-            const storedState = localStorage.getItem('oauth_state');
-            if (storedState) {
-                // Verify the state parameter to prevent CSRF attacks
-                if (state !== storedState) {
-                    displayMessage("Error: Invalid state parameter.");
-                    return;
-                }
-                // Ensure the authorization code is present
-                if (!code) {
-                    displayMessage("Error: Missing authorization code.");
-                    return;
-                }
-                // Redirect to the app with the authorization code and state
-                window.location.href = `myapp://auth/linkedin/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+        // Debug logging of parameters
+        console.log('Authorization Code:', code);
+        console.log('State:', state);
+        
+        // Retrieve stored state (if applicable)
+        const storedState = localStorage.getItem('oauth_state');
+        console.log('Stored State:', storedState);
+
+        // Function to attempt redirect
+        function attemptRedirect() {
+            if (code && state) {
+                const redirectURL = `myapp://auth/linkedin/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+                console.log('Attempting redirect to:', redirectURL);
+                
+                // Fallback redirect mechanisms
+                window.location.replace(redirectURL);
+                setTimeout(() => {
+                    window.location.href = redirectURL;
+                }, 100);
+            } else {
+                console.error('Missing code or state for redirect');
             }
-            else {
-              displayMessage("Data unavailable yet.");
-            }
-            // Handle error scenarios
-            if (error) {
-                displayMessage(`Error: ${error}. ${decodeURIComponent(errorDescription)}`);
-                return;
-            }
-          }
-        innerFunction();
-      })();
+        }
+
+        // Error handling
+        if (error) {
+            console.error('OAuth Error:', error);
+            document.body.innerHTML = `Error: ${error}`;
+            return;
+        }
+
+        // Validate state if stored state exists
+        if (storedState && state !== storedState) {
+            console.error('State mismatch');
+            document.body.innerHTML = 'Authorization failed: Invalid state';
+            return;
+        }
+
+        // Attempt redirect
+        attemptRedirect();
+    });
     </script>
 </head>
 <body>
-    Redirecting to app...
+    <h1>Redirecting to LinkMax...</h1>
+    <p id="status">Please wait while we complete authentication...</p>
 </body>
 </html>
